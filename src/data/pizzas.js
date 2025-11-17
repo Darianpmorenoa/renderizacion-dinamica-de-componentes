@@ -1,74 +1,50 @@
-export const pizzas = [
-  {
-    desc: "La pizza napolitana, de masa tierna y delgada pero bordes altos, es la versión propia de la cocina napolitana de la pizza redonda. El término pizza napoletana, por su importancia histórica o regional, se emplea en algunas zonas como sinónimo de pizza tonda.",
-    id: "P001",
-    img: "https://firebasestorage.googleapis.com/v0/b/apis-varias-mias.appspot.com/o/pizzeria%2Fpizza-1239077_640_cl.jpg?alt=media&token=6a9a33da-5c00-49d4-9080-784dcc87ec2c",
-    ingredients: ["mozzarella", "tomates", "jamón", "orégano"],
-    name: "napolitana",
-    price: 5950,
-  },
-  {
-    desc: "La pizza es una preparación culinaria que consiste en un pan plano, habitualmente de forma circular, elaborado con harina de trigo, levadura, agua y sal (a veces aceite de oliva) que comúnmente se cubre con salsa de tomate, queso y otros muchos ingredientes, y que se hornea a alta temperatura, tradicionalmente en un horno de leña.",
-    id: "P002",
-    img: "https://firebasestorage.googleapis.com/v0/b/apis-varias-mias.appspot.com/o/pizzeria%2Fcheese-164872_640_com.jpg?alt=media&token=18b2b821-4d0d-43f2-a1c6-8c57bc388fab",
-    ingredients: ["mozzarella", "tomates", "jamón", "choricillo"],
-    name: "española",
-    price: 7250,
-  },
-  {
-    desc: "La pizza es una preparación culinaria que consiste en un pan plano, habitualmente de forma circular, elaborado con harina de trigo, levadura, agua y sal (a veces aceite de oliva) que comúnmente se cubre con salsa de tomate, queso y otros muchos ingredientes, y que se hornea a alta temperatura, tradicionalmente en un horno de leña.",
-    id: "P003",
-    img: "https://firebasestorage.googleapis.com/v0/b/apis-varias-mias.appspot.com/o/pizzeria%2Fpizza-1239077_640_com.jpg?alt=media&token=e7cde87a-08d5-4040-ac54-90f6c31eb3e3",
-    ingredients: ["mozzarella", "tomates", "salame", "orégano"],
-    name: "salame",
-    price: 5990,
-  },
-  {
-    desc: "La pizza es una preparación culinaria que consiste en un pan plano, habitualmente de forma circular, elaborado con harina de trigo, levadura, agua y sal (a veces aceite de oliva) que comúnmente se cubre con salsa de tomate, queso y otros muchos ingredientes, y que se hornea a alta temperatura, tradicionalmente en un horno de leña.",
-    id: "P004",
-    img: "https://firebasestorage.googleapis.com/v0/b/apis-varias-mias.appspot.com/o/pizzeria%2Fpizza-2000595_640_c.jpg?alt=media&token=61325b6e-a1e0-441e-b3b5-7335ba13e8be",
-    ingredients: ["mozzarella", "salame", "aceitunas", "champiñones"],
-    name: "cuatro estaciones",
-    price: 9590,
-  },
-  {
-    desc: "La pizza es una preparación culinaria que consiste en un pan plano, habitualmente de forma circular, elaborado con harina de trigo, levadura, agua y sal (a veces aceite de oliva) que comúnmente se cubre con salsa de tomate, queso y otros muchos ingredientes, y que se hornea a alta temperatura, tradicionalmente en un horno de leña.",
-    id: "P005",
-    img: "https://firebasestorage.googleapis.com/v0/b/apis-varias-mias.appspot.com/o/pizzeria%2Fpizza-salame.jpg?alt=media&token=ab3d4bf8-01f2-4810-982b-bd7fb6b517b2",
-    ingredients: ["mozzarella", "tomates cherry", "bacon", "orégano"],
-    name: "bacon",
-    price: 6450,
-  },
-  {
-    desc: "La pizza es una preparación culinaria que consiste en un pan plano, habitualmente de forma circular, elaborado con harina de trigo, levadura, agua y sal (a veces aceite de oliva) que comúnmente se cubre con salsa de tomate, queso y otros muchos ingredientes, y que se hornea a alta temperatura, tradicionalmente en un horno de leña.",
-    id: "P006",
-    img: "https://firebasestorage.googleapis.com/v0/b/apis-varias-mias.appspot.com/o/pizzeria%2Fpizza-2000595_640_c.jpg?alt=media&token=61325b6e-a1e0-441e-b3b5-7335ba13e8be",
-    ingredients: ["mozzarella", "pimientos", "pollo grillé", "orégano"],
-    name: "pollo picante",
-    price: 8500,
-  },
-];
-export const pizzaCart = [
-  {
-    id: "P001",
-    name: "napolitana",
-    price: 5950,
-    count: 1,
-    img: "https://firebasestorage.googleapis.com/v0/b/apis-varias-mias.appspot.com/o/pizzeria%2Fpizza-1239077_640_cl.jpg?alt=media&token=6a9a33da-5c00-49d4-9080-784dcc87ec2c",
-  },
-  {
-    id: "P002",
-    name: "española",
-    price: 7250,
-    count: 1,
-    img: "https://firebasestorage.googleapis.com/v0/b/apis-varias-mias.appspot.com/o/pizzeria%2Fcheese-164872_640_com.jpg?alt=media&token=18b2b821-4d0d-43f2-a1c6-8c57bc388fab",
-  },
-  {
-    id: "P003",
-    name: "salame",
-    price: 5990,
-    count: 1,
-    img: "https://firebasestorage.googleapis.com/v0/b/apis-varias-mias.appspot.com/o/pizzeria%2Fpizza-1239077_640_com.jpg?alt=media&token=e7cde87a-08d5-4040-ac54-90f6c31eb3e3",
-  },
-];
-export default pizzas;
+import React, { useState, useEffect } from 'react';
+
+function MenuDePizzas() {
+  const [pizzas, setPizzas] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
+
+  useEffect(() => {
+    const API_URL = 'http://localhost:5001/api/pizzas'; 
+
+    fetch(API_URL)
+      .then(response => {
+        if (!response.ok) {
+          throw new Error(`Error en la solicitud: ${response.status}`);
+        }
+        return response.json();
+      })
+      .then(data => {
+        setPizzas(data); 
+      })
+      .catch(error => {
+        console.error("Hubo un problema al obtener las pizzas:", error);
+        setError(error.message);
+      })
+      .finally(() => {
+        setLoading(false);
+      });
+  }, []); 
+
+  if (loading) return <div>Cargando menú...</div>;
+  if (error) return <div>Error: No se pudo cargar el menú. Revisa la consola para más detalles.</div>;
+
+  return (
+    <div>
+      <h2>Nuestro Menú de Pizzas 🍕</h2>
+      <ul>
+        {pizzas.map(pizza => (
+          <li key={pizza.id}>
+            <h3>{pizza.nombre}</h3>
+            <p>{pizza.descripcion}</p>
+            <p>Precio: ${pizza.precio}</p>
+            <img src={pizza.imagen} alt={pizza.nombre} style={{ width: '200px' }} />
+          </li>
+        ))}
+      </ul>
+    </div>
+  );
+}
+
+export default MenuDePizzas;

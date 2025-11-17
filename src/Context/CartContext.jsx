@@ -1,67 +1,77 @@
-import React, { createContext, useState, useContext } from 'react';
+import React, { createContext, useContext, useState, useMemo } from 'react';
 
-export const CartContext = createContext();
+const CartContext = createContext();
+
 export const useCart = () => {
-    return useContext(CartContext);
+  const context = useContext(CartContext);
+  if (!context) {
+    throw new Error('useCart debe ser utilizado dentro de un CartProvider');
+  }
+  return context;
 };
 
-export const CartProvider = ({ children }) => {
-    const [cartItems, setCartItems] = useState([]);
+const CartProvider = ({ children }) => {
+  const [cart, setCart] = useState([]);
 
-    const addToCart = (pizza) => {
-        setCartItems(prevItems => {
-            const itemIndex = prevItems.findIndex(item => item.id === pizza.id);
-            
-            if (itemIndex > -1) {
-                const newItems = [...prevItems];
-                newItems[itemIndex] = {
-                    ...newItems[itemIndex],
-                    quantity: newItems[itemIndex].quantity + 1,
-                };
-                return newItems;
-            } else {
-                return [...prevItems, { ...pizza, quantity: 1 }];
-            }
-        });
-    };
-    
-    const increaseQuantity = (id) => {
-        setCartItems(prevItems => {
-            return prevItems.map(item => 
-                item.id === id ? { ...item, quantity: item.quantity + 1 } : item
-            );
-        });
-    };
+  const addToCart = (pizza) => {
+    setCart(prevCart => {
+      const existingItemIndex = prevCart.findIndex(item => item.id === pizza.id);
 
-    const decreaseQuantity = (id) => {
-        setCartItems(prevItems => {
-            return prevItems.flatMap(item => {
-                if (item.id === id) {
-                    if (item.quantity > 1) {
-                        return [{ ...item, quantity: item.quantity - 1 }];
-                    } 
-                    return [];
-                }
-                return [item];
-            });
-        });
-    };
+      if (existingItemIndex > -1) {
+        const newCart = [...prevCart];
+        newCart[existingItemIndex] = {
+          ...newCart[existingItemIndex],
+          quantity: newCart[existingItemIndex].quantity + 1,
+        };
+        return newCart;
+      } else {
+        return [...prevCart, { ...pizza, quantity: 1 }];
+      }
+    });
+  };
 
-    const calculateTotal = () => {
-        return cartItems.reduce((acc, item) => acc + (item.price * item.quantity), 0);
-    };
+  const incrementQuantity = (id) => {
+    setCart(prevCart => prevCart.map(item => 
+      item.id === id ? { ...item, quantity: item.quantity + 1 } : item
+    ));
+  };
 
-    const contextValue = {
-        cartItems,
-        addToCart,
-        increaseQuantity,
-        decreaseQuantity,
-        calculateTotal,
-    };
+  const decrementQuantity = (id) => {
+    setCart(prevCart => {
+      const item = prevCart.find(item => item.id === id);
+      if (item && item.quantity > 1) {
+        return prevCart.map(i =>
+          i.id === id ? { ...i, quantity: i.quantity - 1 } : i
+        );
+      } else if (item && item.quantity === 1) {
+        return prevCart.filter(i => i.id !== id);
+      }
+      return prevCart;
+    });
+  };
 
-    return (
-        <CartContext.Provider value={contextValue}>
-            {children}
-        </CartContext.Provider>
-    );
+  const removeItem = (id) => {
+    setCart(prevCart => prevCart.filter(item => item.id !== id));
+  };
+
+  const getTotal = useMemo(() => () => {
+    return cart.reduce((total, item) => total + item.price * item.quantity, 0);
+  }, [cart]);
+
+  const contextValue = useMemo(() => ({
+    cart,
+    addToCart,
+    getTotal,
+    incrementQuantity,
+    decrementQuantity,
+    removeItem,
+  }), [cart, getTotal]);
+
+  return (
+    <CartContext.Provider value={contextValue}>
+      {children}
+    </CartContext.Provider>
+  );
 };
+
+export default CartProvider; 
