@@ -1,52 +1,36 @@
-import React, { useState } from 'react';
-import Home from './components/Home.jsx'; 
-import Cart from './components/Cart.jsx';
+import React from 'react';
+import { BrowserRouter, Routes, Route } from 'react-router-dom';
 import Navbar from './components/Navbar.jsx';
-import PizzaDetail from './components/Pizza.jsx'; 
-import CartProvider from './Context/CartContext.jsx';
-import Login from './components/Login.jsx'; 
 import Footer from './components/Footer.jsx';
 
+import Home from './pages/Home.jsx';
+import DetallePizza from './pages/DetallePizza.jsx';
+import Cart from './pages/Cart.jsx';
+import Login from './pages/Login.jsx';
+import Register from './pages/Register.jsx';
+import Profile from './pages/Profile.jsx';
+import NotFound from './pages/NotFound.jsx'; 
+
 const App = () => {
-  const [currentView, setCurrentView] = useState('home'); 
-  const [selectedPizzaId, setSelectedPizzaId] = useState(null);
-
-  const handleViewChange = (view, id = null) => {
-    setCurrentView(view);
-    if (view === 'detail' && id) {
-      setSelectedPizzaId(id);
-    } else {
-      setSelectedPizzaId(null);
-    }
-  };
-
-  const renderContent = () => {
-    switch (currentView) {
-      case 'home':
-        return <Home onViewChange={handleViewChange} />;
-      case 'cart':
-        return <Cart onViewChange={handleViewChange} />;
-      case 'login':
-        return <Login onViewChange={handleViewChange} />;
-      case 'detail':
-        return <PizzaDetail pizzaId={selectedPizzaId} onViewChange={handleViewChange} />;
-      default:
-        return <Home onViewChange={handleViewChange} />;
-    }
-  };
-
   return (
-    <CartProvider>
-      <div className="min-h-screen flex flex-col bg-gray-50 font-inter">
-        <Navbar onViewChange={handleViewChange} />
+    <BrowserRouter>
+      <Navbar />
 
-        <main className="flex-grow container mx-auto p-4 sm:p-6 lg:p-8">
-          {renderContent()}
-        </main>
+      <main className="min-h-[80vh] py-8 px-4 sm:px-6 lg:px-8">
+        <Routes>
+          <Route path="/" element={<Home />} />
+          <Route path="/pizza/:id" element={<DetallePizza />} />
+          <Route path="/cart" element={<Cart />} />
+          <Route path="/login" element={<Login />} />
+          <Route path="/register" element={<Register />} />
+          <Route path="/profile" element={<Profile />} />
+          
+          <Route path="*" element={<NotFound />} />
+        </Routes>
+      </main>
 
-        <Footer />
-      </div>
-    </CartProvider>
+      <Footer />
+    </BrowserRouter>
   );
 };
 

@@ -1,52 +1,91 @@
 import React from 'react';
-import { useCart } from '../context/CartContext.jsx'; 
+import { Link, useNavigate } from 'react-router-dom';
+import { useCart } from '../Context/CartContext.jsx'; 
+import { useAuth } from '../Context/AuthContext.jsx'; 
 
-const Navbar = ({ onViewChange }) => {
-  const { cart } = useCart();
-  const totalItems = cart.reduce((total, item) => total + item.quantity, 0);
+const formatCurrency = (amount) => {
+    return amount.toLocaleString('es-CL', { style: 'currency', currency: 'CLP' });
+};
 
-  return (
-    <header className="bg-red-800 shadow-xl sticky top-0 z-50">
-      <div className="container mx-auto px-4 sm:px-6 lg:px-8 py-4 flex justify-between items-center">
-        
-        {/* Nombre de la Pizzería */}
-        <div 
-          className="text-white text-3xl font-extrabold cursor-pointer transition duration-300 hover:text-red-300" 
-          onClick={() => onViewChange('home')}
-        >
-          Mamma Mia! 🍕
-        </div>
+const Navbar = () => {
+    // Contexto del Carrito
+    const { total, itemCount } = useCart();
+    
+    // Contexto de Autenticación
+    const { user, logout, isAuthenticated } = useAuth(); 
+    
+    const navigate = useNavigate();
 
-        {/* Links de Navegación y Carrito */}
-        <nav className="flex items-center space-x-6">
-          
-          {/* Link Inicio */}
-          <button 
-            onClick={() => onViewChange('home')}
-            className="text-white font-semibold transition duration-300 hover:text-red-300 text-lg"
-          >
-            Inicio
-          </button>
-          
-          {/* Link Carrito */}
-          <button 
-            onClick={() => onViewChange('cart')}
-            className="relative p-2 rounded-full text-white bg-red-700 hover:bg-red-600 transition duration-300 flex items-center space-x-1"
-          >
-            <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
-              <path strokeLinecap="round" strokeLinejoin="round" d="M3 3h2l.4 2M7 13h10l4-8H5.4M7 13L5.4 5M7 13l-2.293 2.293c-.63.63-.184 1.707.707 1.707H17m0 0a2 2 0 100 4 2 2 0 000-4zm-8 2a2 2 0 11-4 0 2 2 0 014 0z" />
-            </svg>
-            
-            {/* Contador de artículos en el carrito */}
-            <span className="absolute top-0 right-0 inline-flex items-center justify-center px-2 py-1 text-xs font-bold leading-none text-red-100 transform translate-x-1/2 -translate-y-1/2 bg-yellow-500 rounded-full">
-              {totalItems}
-            </span>
-          </button>
+    return (
+        <nav className="bg-red-700 shadow-lg sticky top-0 z-10">
+            <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+                <div className="flex justify-between items-center h-16">
+                    
+                    {/* Logotipo y Link a Home */}
+                    <div className="flex-shrink-0">
+                        <Link to="/" className="flex items-center space-x-2 text-white text-2xl font-extrabold hover:text-red-100 transition duration-150">
+                            <span className="text-3xl">🍕</span>
+                            <span>Pizzería MammaMia</span>
+                        </Link>
+                    </div>
 
+                    {/* Elementos de Navegación, Auth y Carrito */}
+                    <div className="flex items-center space-x-4">
+                    
+                        {isAuthenticated ? (
+                            <>
+                                <span className="text-white hidden md:inline font-semibold">
+                                    Hola, {user.name}
+                                </span>
+                                <button 
+                                    onClick={logout} 
+                                    className="bg-red-500 hover:bg-red-600 text-white font-bold py-2 px-4 rounded-lg transition duration-300 shadow-md"
+                                >
+                                    Cerrar Sesión
+                                </button>
+                            </>
+                        ) : (
+                            <>
+                                <Link 
+                                    to="/login" 
+                                    className="text-white hover:text-red-300 transition duration-150 font-medium"
+                                >
+                                    Iniciar Sesión
+                                </Link>
+                                <Link 
+                                    to="/register" 
+                                    className="bg-white text-red-700 font-bold py-2 px-4 rounded-lg hover:bg-red-100 transition duration-150 shadow-md"
+                                >
+                                    Registrarse
+                                </Link>
+                            </>
+                        )}
+
+                        {/* Botón/Link del Carrito */}
+                        <button 
+                            onClick={() => navigate('/cart')}
+                            className="relative flex items-center bg-red-800 hover:bg-red-900 text-white font-bold py-2 px-3 rounded-full transition duration-300 shadow-md transform hover:scale-105 ml-4"
+                        >
+                            {/* Icono del Carrito */}
+                            <span className="text-2xl mr-2">🛒</span>
+                            
+                            {/* Mostrar Total */}
+                            <span className="text-lg font-semibold hidden sm:inline">
+                                {formatCurrency(total)}
+                            </span>
+
+                            {/* Insignia de Cantidad */}
+                            {itemCount > 0 && (
+                                <span className="absolute top-0 right-0 inline-flex items-center justify-center px-2 py-1 text-xs font-bold leading-none text-red-100 transform translate-x-1/2 -translate-y-1/2 bg-green-500 rounded-full">
+                                    {itemCount}
+                                </span>
+                            )}
+                        </button>
+                    </div>
+                </div>
+            </div>
         </nav>
-      </div>
-    </header>
-  );
+    );
 };
 
 export default Navbar;
